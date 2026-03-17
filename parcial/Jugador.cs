@@ -14,7 +14,7 @@ public class Jugador
 
     public bool PuedePagar(decimal monto)
     {
-        return Oro >= monto;
+        return monto >= 0 && Oro >= monto;
     }
 
     public bool GastarOro(decimal monto)
@@ -28,6 +28,9 @@ public class Jugador
 
     public void AgregarItem(Item item)
     {
+        if (item == null || !item.EsValido())
+            return;
+
         if (item.Categoria == CategoriaItem.Supply)
             Consumibles.Add(item);
         else

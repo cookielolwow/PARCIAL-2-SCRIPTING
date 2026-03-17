@@ -1,7 +1,4 @@
-﻿using System;
-
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 public class Tienda
 {
@@ -9,8 +6,17 @@ public class Tienda
 
     public Tienda(List<ItemTienda> itemsIniciales)
     {
-        if (itemsIniciales != null && itemsIniciales.Count > 0)
-            inventario = itemsIniciales;
+        if (itemsIniciales != null)
+        {
+            for (int i = 0; i < itemsIniciales.Count; i++)
+            {
+                var it = itemsIniciales[i];
+                if (it != null && it.Item != null && it.Item.EsValido())
+                {
+                    inventario.Add(it);
+                }
+            }
+        }
     }
 
     public bool TieneItems()
@@ -20,12 +26,22 @@ public class Tienda
 
     public bool AgregarItem(Item item, int cantidad)
     {
-        if (item == null || !item.EsValido() || cantidad < 0)
+        if (item == null || !item.EsValido() || cantidad <= 0) 
             return false;
 
-        var existente = inventario.FirstOrDefault(i =>
-            i.Item.Nombre == item.Nombre &&
-            i.Item.Categoria == item.Categoria);
+        ItemTienda existente = null;
+
+        for (int i = 0; i < inventario.Count; i++)
+        {
+            var it = inventario[i];
+
+            if (it.Item.Nombre == item.Nombre &&
+                it.Item.Categoria == item.Categoria)
+            {
+                existente = it;
+                break;
+            }
+        }
 
         if (existente != null)
         {
@@ -41,22 +57,39 @@ public class Tienda
 
     public bool TieneStock(Item item, int cantidad)
     {
-        var existente = inventario.FirstOrDefault(i =>
-            i.Item.Nombre == item.Nombre &&
-            i.Item.Categoria == item.Categoria);
+        if (item == null || !item.EsValido() || cantidad <= 0)
+            return false;
 
-        return existente != null && existente.Cantidad >= cantidad;
+        for (int i = 0; i < inventario.Count; i++)
+        {
+            var it = inventario[i];
+
+            if (it.Item.Nombre == item.Nombre &&
+                it.Item.Categoria == item.Categoria)
+            {
+                return it.Cantidad >= cantidad;
+            }
+        }
+
+        return false;
     }
 
     public bool ReducirStock(Item item, int cantidad)
     {
-        var existente = inventario.FirstOrDefault(i =>
-            i.Item.Nombre == item.Nombre &&
-            i.Item.Categoria == item.Categoria);
-
-        if (existente == null)
+        if (item == null || !item.EsValido() || cantidad <= 0)
             return false;
 
-        return existente.ReducirCantidad(cantidad);
+        for (int i = 0; i < inventario.Count; i++)
+        {
+            var it = inventario[i];
+
+            if (it.Item.Nombre == item.Nombre &&
+                it.Item.Categoria == item.Categoria)
+            {
+                return it.ReducirCantidad(cantidad);
+            }
+        }
+
+        return false;
     }
 }
